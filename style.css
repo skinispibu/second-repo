@@ -1,0 +1,32 @@
+body {
+  font-family: "Noto Sans KR", sans-serif;
+  color: rgb(0, 0, 0);
+  background-color: rgb(105, 192, 151);
+}
+.title {
+  margin: auto;
+  text-align: center;
+}
+.main {
+  margin: auto;
+  width: 50%;
+  border-radius: 10px;
+  border: 3px solid rgb(69, 85, 80);
+  padding: 10px;
+  text-align: center;
+}
+
+.line {
+  margin: auto;
+  width: 50%;
+  text-align: center;
+}
+
+.navbar-brand {
+  text-align: center;
+}
+
+.list-group {
+  margin: auto;
+  width: 30%;
+}

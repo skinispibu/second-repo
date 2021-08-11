@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="preconnect" href="https://fonts.gstatic.com" /> -->
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&display=swap" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <title>새싹지키기</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1 class="container mt-5 mb-3 title">STEAM 탈모예방 '새싹지키기'</h1>
+    <h3 class="container mt-5 line">본 사이트는 효명고등학교 과학 탐구대회 STEAM분야에 참여하는 목적으로 만들어졌습니다.</h3>
+    <div class="container mt-3 mb-4 line">구글의 Teachable Machine을 이용하여 탈모의 진행정도를 파악할 수 있는 사이트입니다. 
+        손으로 이마와 헤어라인이 보이기 사진을 찍어서 업로드해주시면 인공지능이 탈모의 여부를 판단해드립니다.</div>
+    <div class="main">    
+        <div>Talmo Test</div>
+        <button type="button" onclick="init()">Start</button>
+        <div id="webcam-container"></div>
+        <div id="label-container"></div>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+        <script type="text/javascript">
+            // More API functions here:
+            // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+        
+            // the link to your model provided by Teachable Machine export panel
+            const URL = "https://teachablemachine.withgoogle.com/models/AfH9dcR9a/";
+        
+            let model, webcam, labelContainer, maxPredictions;
+        
+            // Load the image model and setup the webcam
+            async function init() {
+                const modelURL = URL + "model.json";
+                const metadataURL = URL + "metadata.json";
+        
+                // load the model and metadata
+                // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+                // or files from your local hard drive
+                // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+                model = await tmImage.load(modelURL, metadataURL);
+                maxPredictions = model.getTotalClasses();
+        
+                // Convenience function to setup a webcam
+                const flip = true; // whether to flip the webcam
+                webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+                await webcam.setup(); // request access to the webcam
+                await webcam.play();
+                window.requestAnimationFrame(loop);
+        
+                // append elements to the DOM
+                document.getElementById("webcam-container").appendChild(webcam.canvas);
+                labelContainer = document.getElementById("label-container");
+                for (let i = 0; i < maxPredictions; i++) { // and class labels
+                    labelContainer.appendChild(document.createElement("div"));
+                }
+            }
+        
+            async function loop() {
+                webcam.update(); // update the webcam frame
+                await predict();
+                window.requestAnimationFrame(loop);
+            }
+        
+            // run the webcam image through the image model
+            async function predict() {
+                // predict can take in an image, video or canvas html element
+                const prediction = await model.predict(webcam.canvas);
+                for (let i = 0; i < maxPredictions; i++) {
+                    const classPrediction =
+                        prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+                    labelContainer.childNodes[i].innerHTML = classPrediction;
+                }
+            }
+        </script>
+    </div>
+    <ul class="pt-5 container text-center list-group">
+		<li class="list-group-item list-group-item-dark">탈모 진행도</li>
+		<li class="list-group-item list-group-item-dark">✨ ✨ 진행안됨 ✨ ✨</li>
+		<li class="list-group-item list-group-item-dark">🌟 🌟 초기 🌟 🌟</li>
+		<li class="list-group-item list-group-item-dark">⭐ ⭐ 중기 ⭐ ⭐</li>
+		<li class="list-group-item list-group-item-dark">✰ ✰ 말기  ✰ ✰</li>
+	</ul>
+    <div class="container mt-5 mb-3 title">10704 김하경, 10708 유승윤</div>
+    <footer class="mt-3 container line">
+        <div>
+            <p>© 탈모예측테스트 2021. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
